@@ -20,23 +20,118 @@
     <p1>Textfeld: </p1>
     <input id="text-input"><br><br>
     Text: <p1 id="text-display">0</p1>
+    <br>
+    <br>
+    <br>
+    _____________________________________________________
+    <br>
+    <br>
+    <br>
+    <br>
+    Mein Name ist: <p1 id="text-name"></p1><br>
+    Change Name: <input id="input-name"> <button id="btn-change-name">CHANGE</button> <button id="btn-remove-name">REMOVE</button>
+    <br>
+    <br>
+    <br>
+    _____________________________________________________
+    <br>
+    <br>
+    <br>
+    <br>
+    <button id="btn-upload">UPLOAD</button> <input id="input-upload"><br><br>
+    <button id="btn-download">DOWNLOAD</button> <p1 id="download-text"></p1>
+    <br>
+    <br>
+    <br>
+    _____________________________________________________
+    <br>
+    <br>
+    <br>
+    <br>
+
     <script>
         let i = 0;
 
         const displayElement = document.getElementById('text-display');
         const inputElement = document.getElementById('text-input');
         const updateButton = document.getElementById('update-btn');
+        const nameButton = document.getElementById('btn-change-name');
+        const removeButton = document.getElementById('btn-remove-name');
+        const inputName = document.getElementById('input-name');
+        const displayName = document.getElementById('text-name');
+        const btn_upload = document.getElementById('btn-upload');
+        const btn_download = document.getElementById('btn-download');
+        const displayText = document.getElementById('download-text');
+        const inputText = document.getElementById('input-upload');
+
+        let storedUrl = "https://iclzqbokbeeqmkjgakum.supabase.co";
+        let storedKey = "sb_publishable_v-VIQ8D_3PnibM7tUZpBSg_dM2jTd6u";
+        
+        let supabaseClient = window.supabase.createClient(storedUrl, storedKey);
+
+        displayName.textContent = localStorage.getItem("name") || "Max Mustermann";
 
         function updateText() 
         {
             const newText = inputElement.value.trim();
 
-            displayElement.textContent = newText + ": " + i;
+            displayElement.textContent = newText + " " + i;
             i += 1;
             inputElement.value=""
         }
 
+        function updateName()
+        {
+            localStorage.setItem("name", inputName.value);
+            displayName.textContent = localStorage.getItem("name");
+            inputName.value = "";
+        }
+
+        function removeName()
+        {
+            localStorage.removeItem("name", inputName.value);
+            displayName.textContent = "404 - name not found";
+        }
+
+        async function uploadToSupabase() 
+        {
+            newText = inputText.value;
+            try 
+            {
+                const payload = { id: 0 };
+                if (newText !== undefined) payload.text_value = newText;
+
+                console.log(newText);
+                
+                const { error } = await supabaseClient
+                    .from('changetext')
+                    .upsert(payload);
+                
+                inputText.value = "";
+            } 
+            catch (err) { }
+        }
+
+        async function downloadFromSupabase() 
+        {
+            try 
+            {
+                const { data, error } = await supabaseClient
+                    .from('changetext')
+                    .select('text_value')
+                    .eq('id', 0)
+                    .maybeSingle();
+
+                if (data.text_value !== undefined) displayText.textContent = data.text_value;
+            } 
+            catch (err) { }
+        }
+
+        btn_download.addEventListener('click', downloadFromSupabase);
+        btn_upload.addEventListener('click', uploadToSupabase);
         updateButton.addEventListener('click', updateText);
+        nameButton.addEventListener('click', updateName);
+        removeButton.addEventListener('click', removeName);
     </script>
 </body>
 </html>
