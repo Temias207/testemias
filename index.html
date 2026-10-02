@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Testseite</title>
+    <link rel="apple-touch-icon" sizes="749x749" href="icon.png">
+
+    <!-- Supabase JS Client v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+    </style>
+</head>
+<body>
+    <h1>Das ist eine Überschrift</h1>
+    Und jetzt kommt ein Button:
+    <button id="update-btn">Klick mich!</button>
+    <br>
+    Neue Zeileeeeeeöööö!!!<br><br>
+    <p1>Textfeld: </p1>
+    <input id="text-input"><br><br>
+    Text: <p1 id="text-display">0</p1>
+    <script>
+        let i = 0;
+
+        const displayElement = document.getElementById('text-display');
+        const inputElement = document.getElementById('text-input');
+        const updateButton = document.getElementById('update-btn');
+
+        function updateText() 
+        {
+            const newText = inputElement.value.trim();
+
+            displayElement.textContent = newText + ": " + i;
+            i += 1;
+            inputElement.value=""
+        }
+
+        updateButton.addEventListener('click', updateText);
+    </script>
+</body>
+</html>
