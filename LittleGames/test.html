@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { margin: 0; overflow: hidden; background: #222; color: white; font-family: sans-serif; }
+    canvas { display: block; cursor: grab; }
+    canvas:active { cursor: grabbing; }
+    #ui { position: absolute; top: 10px; left: 10px; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <h2>5 Gewinnt (Unendlich)</h2>
+    <p>Spieler: <span id="player">1 (Rot)</span></p>
+    <p><small>Mausrad = Zoomen | Ziehen = Bewegen | Klick = Setzen</small></p>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Spielfeld-Zustand (Koordinaten -> Spieler ID)
+    // Key-Format: "x,y"
+    const gridData = new Map();
+    let currentPlayer = 1;
+
+    // Kamera-Einstellungen
+    const GRID_SIZE = 40; // Pixel-Größe eines Feldes bei Scale = 1
+    let scale = 1;
+    let offsetX = window.innerWidth / 2;
+    let offsetY = window.innerHeight / 2;
+
+    // Drag-Zustand
+    let isDragging = false;
+    let startX, startY;
+    let draggedDistance = 0;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      draw();
+    }
+    window.addEventListener('resize', resize);
+
+    // Haupt-Zeichenfunktion
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      // Kamera-Transformation anwenden
+      ctx.translate(offsetX, offsetY);
+      ctx.scale(scale, scale);
+
+      // Sichtbaren Bereich berechnen (Performance-Optimierung)
+      const minCol = Math.floor((-offsetX / scale) / GRID_SIZE) - 1;
+      const maxCol = Math.ceil(((canvas.width - offsetX) / scale) / GRID_SIZE) + 1;
+      const minRow = Math.floor((-offsetY / scale) / GRID_SIZE) - 1;
+      const maxRow = Math.ceil(((canvas.height - offsetY) / scale) / GRID_SIZE) + 1;
+
+      // 1. Gitter zeichnen
+      ctx.strokeStyle = '#444';
+      ctx.lineWidth = 1 / scale; // Konstante Liniendicke halten
+
+      ctx.beginPath();
+      for (let x = minCol; x <= maxCol; x++) {
+        ctx.moveTo(x * GRID_SIZE, minRow * GRID_SIZE);
+        ctx.lineTo(x * GRID_SIZE, maxRow * GRID_SIZE);
+      }
+      for (let y = minRow; y <= maxRow; y++) {
+        ctx.moveTo(minCol * GRID_SIZE, y * GRID_SIZE);
+        ctx.lineTo(maxCol * GRID_SIZE, y * GRID_SIZE);
+      }
+      ctx.stroke();
+
+      // 2. Steine zeichnen
+      gridData.forEach((player, key) => {
+        const [gx, gy] = key.split(',').map(Number);
+        
+        ctx.fillStyle = player === 1 ? '#e74c3c' : '#f1c40f';
+        ctx.beginPath();
+        ctx.arc(
+          gx * GRID_SIZE + GRID_SIZE / 2,
+          gy * GRID_SIZE + GRID_SIZE / 2,
+          GRID_SIZE * 0.4,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+      });
+
+      ctx.restore();
+    }
+
+    // Umrechnung: Bildschirm-Pixel -> Gitter-Koordinate (x, y)
+    function screenToGrid(screenX, screenY) {
+      const worldX = (screenX - offsetX) / scale;
+      const worldY = (screenY - offsetY) / scale;
+      return {
+        x: Math.floor(worldX / GRID_SIZE),
+        y: Math.floor(worldY / GRID_SIZE)
+      };
+    }
+
+    // Event-Listener: Zoomen mit Mausrad
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = 1.1;
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+
+      // Zoom-Zentrum auf Mauszeiger ausrichten
+      const newScale = e.deltaY < 0 ? scale * zoomFactor : scale / zoomFactor;
+      if (newScale < 0.2 || newScale > 5) return; // Zoom-Grenzen
+
+      offsetX = mouseX - (mouseX - offsetX) * (newScale / scale);
+      offsetY = mouseY - (mouseY - offsetY) * (newScale / scale);
+      scale = newScale;
+
+      draw();
+    }, { passive: false });
+
+    // Event-Listener: Verschieben (Pan)
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX - offsetX;
+      startY = e.clientY - offsetY;
+      draggedDistance = 0;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        const dx = e.clientX - (startX + offsetX);
+        const dy = e.clientY - (startY + offsetY);
+        draggedDistance += Math.abs(dx) + Math.abs(dy);
+
+        offsetX = e.clientX - startX;
+        offsetY = e.clientY - startY;
+        draw();
+      }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      // Wenn wenig gezogen wurde, zählt es als Klick
+      if (isDragging && draggedDistance < 5) {
+        const gridPos = screenToGrid(e.clientX, e.clientY);
+        const key = `${gridPos.x},${gridPos.y}`;
+
+        if (!gridData.has(key)) {
+          gridData.set(key, currentPlayer);
+          currentPlayer = currentPlayer === 1 ? 2 : 1;
+          document.getElementById('player').textContent = 
+            currentPlayer === 1 ? '1 (Rot)' : '2 (Gelb)';
+          draw();
+        }
+      }
+      isDragging = false;
+    });
+
+    // Starten
+    resize();
+  </script>
+</body>
+</html>
