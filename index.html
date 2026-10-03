@@ -48,6 +48,7 @@
     <br>
     <br>
     <br>
+    <button id="btn-5wins">5 WINS</button>
 
     <script>
         let i = 0;
@@ -63,6 +64,8 @@
         const btn_download = document.getElementById('btn-download');
         const displayText = document.getElementById('download-text');
         const inputText = document.getElementById('input-upload');
+
+        document.getElementById("btn-5wins").addEventListener("click", function () { window.location.href = "LittleGames/5wins.html"; });
 
         let storedUrl = "https://iclzqbokbeeqmkjgakum.supabase.co";
         let storedKey = "sb_publishable_v-VIQ8D_3PnibM7tUZpBSg_dM2jTd6u";
