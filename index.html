@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Testseite</title>
     <link rel="apple-touch-icon" sizes="749x749" href="icon.png">
- 
+
     <!-- Supabase JS Client v2 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -49,6 +49,15 @@
     <br>
     <br>
     <button id="btn-5wins">5 WINS</button>
+    <br>
+    <br>
+    <br>
+    _____________________________________________________
+    <br>
+    <br>
+    <br>
+    <br>
+    <button id="btn-webgl">WebGL</button>
 
     <script>
         let i = 0;
@@ -66,6 +75,8 @@
         const inputText = document.getElementById('input-upload');
 
         document.getElementById("btn-5wins").addEventListener("click", function () { window.location.href = "LittleGames/test.html"; });
+        document.getElementById("btn-webgl").addEventListener("click", function () { window.location.href = "WebGL/WebGLThink/index.html"; });
+        // document.getElementById("btn-5wins").addEventListener("click", function () { window.location.href = "LittleGames/5wins.html"; });
 
         let storedUrl = "https://iclzqbokbeeqmkjgakum.supabase.co";
         let storedKey = "sb_publishable_v-VIQ8D_3PnibM7tUZpBSg_dM2jTd6u";
