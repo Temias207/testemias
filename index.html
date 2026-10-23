@@ -8,6 +8,13 @@
     <!-- Supabase JS Client v2 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <!-- MathJax für LaTeX usw. -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script> window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } }; </script>
+    <!-- latex.css für latex style -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/latex.css@1.7.0/style.min.css">
+
     <style>
     </style>
 </head>
@@ -60,6 +67,16 @@
     <button id="btn-webgl0">WebGL-Thinking</button>
     <button id="btn-webgl1">WebGL-SmashyRoad</button>
     <button id="btn-webgl2">WebGL-Survival</button>
+    <br>
+    <br>
+    <br>
+    _____________________________________________________
+    <br>
+    <br>
+    <br>
+    <br>
+    Also so sollte man in den Text einfach $\frac{1}{2}$ Brüche einbauen können. Krass $\sqrt{2}$, oder auch so:
+    $$\int_0^\infty x^2~dx$$.
 
     <script>
         let i = 0;
